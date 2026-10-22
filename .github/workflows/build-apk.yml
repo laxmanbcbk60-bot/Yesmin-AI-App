@@ -3,16 +3,13 @@ name: Build Yesmin AI APK
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository Code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -20,15 +17,11 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build with Gradle
-      uses: gradle/actions/setup-gradle@v3
-
-    - name: Generate Build and APK
+    - name: Build with Gradle Wrapper
       run: ./gradlew assembleDebug
 
-    - name: Upload APK Artifact
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: Yesmin-AI-App-APK
+        name: Yesmin-APK
         path: app/build/outputs/apk/debug/app-debug.apk
-        
