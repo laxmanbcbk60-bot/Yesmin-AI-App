@@ -59,18 +59,30 @@ class GeminiService {
                         put("responseMimeType", "application/json")
                     })
                 }
-
-                val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$apiKey"
-                val body = requestJson.toString().toRequestBody("application/json".toMediaType())
-                val request = Request.Builder().url(url).post(body).build()
-
-                val response = client.newCall(request).execute()
-                val responseStr = response.body?.string() ?: ""
-
-                if (!response.isSuccessful) {
-                    return@withContext YesminCommand("Jaan, API key ya internet mein kuch dikkat lag rahi hai (Error ${response.code}).")
-                }
-
+val models = listOf("gemini-3.5-flash", "gemini-flash-latest", "gemini-3-flash-preview")
+var responseStr = ""
+var lastCode = 0
+var ok = false
+for (attempt in 0 until 6) {
+    val model = models[attempt % models.size]
+    val url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey"
+    val body = requestJson.toString().toRequestBody("application/json".toMediaType())
+    val request = Request.Builder().url(url).post(body).build()
+    try {
+        client.newCall(request).execute().use { response ->
+            lastCode = response.code
+            responseStr = response.body?.string() ?: ""
+            ok = response.isSuccessful
+        }
+    } catch (e: Exception) {
+        lastCode = -1
+    }
+    if (ok) break
+    kotlinx.coroutines.delay(1500)
+}
+if (!ok) {
+    return@withContext YesminCommand("Jaan, server abhi busy hai, thodi der baad try karo (Error $lastCode).")
+}
                 val root = JSONObject(responseStr)
                 val text = root.getJSONArray("candidates")
                     .getJSONObject(0)
