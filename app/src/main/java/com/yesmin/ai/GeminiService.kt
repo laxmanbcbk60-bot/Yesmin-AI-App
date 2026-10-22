@@ -60,7 +60,7 @@ class GeminiService {
                     })
                 }
 
-                val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey"
+                val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$apiKey"
                 val body = requestJson.toString().toRequestBody("application/json".toMediaType())
                 val request = Request.Builder().url(url).post(body).build()
 
