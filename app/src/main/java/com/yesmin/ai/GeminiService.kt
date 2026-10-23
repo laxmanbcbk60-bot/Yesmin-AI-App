@@ -57,7 +57,7 @@ class GeminiService {
                     }))
                     put("generationConfig", JSONObject().apply {
                         put("responseMimeType", "application/json")
-                    })
+                        put("thinkingConfig", JSONObject().put("thinkingLevel","low"))})
                 }
 val models = listOf("gemini-3.5-flash", "gemini-flash-latest", "gemini-3-flash-preview")
 var responseStr = ""
@@ -78,7 +78,7 @@ for (attempt in 0 until 6) {
         lastCode = -1
     }
     if (ok) break
-    kotlinx.coroutines.delay(1500)
+    kotlinx.coroutines.delay(700)
 }
 if (!ok) {
     return@withContext YesminCommand("Jaan, server abhi busy hai, thodi der baad try karo (Error $lastCode).")
